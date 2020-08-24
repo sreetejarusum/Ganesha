@@ -1,35 +1,74 @@
 package com.teja.ddt;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Properties;
-
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class DataDrivenTestUsingPOI {
 	
-	public static String file="//Ganesha//data//FinalPlan.xlsx";
-	public static FileInputStream fis;
-	public static Properties props;
-	public static XSSFWorkbook workbook;
-	public static int sheetCount;
-	public static String sheetName="td2";
+	public  String file="C:\\Teja\\Teja2.0\\FrameWork\\Ganesha\\data\\FinalPlan.xlsx";
+	public  FileInputStream fis;
+	public  Properties props;
+	public  XSSFWorkbook workbook;
+	public  int sheetCount;
+	public  String sheetName="td2";
+	public  String columnName="TC's";
+	public  int columnNumber;
+	public  String data="Checkout";
+	public  ArrayList<String> testdata;
 	
-	public static void main(String[] args) throws IOException {
-		
+	
+	public ArrayList<String> getTestData(String SheetName,String columnName,String data) throws IOException{
+		testdata=new ArrayList<String>();
 		fis=new FileInputStream(file);
 		workbook=new XSSFWorkbook(fis);
 		
-		sheetCount=workbook.getNumberOfSheets();
+		XSSFSheet sheet=workbook.getSheet(sheetName);
 		
-		for(int i=0;i<sheetCount;i++) {
-			if(workbook.getSheetAt(i).equals(sheetName)) {
-				XSSFSheet sheet=workbook.getSheetAt(i);
+		Iterator<Row> rows=sheet.iterator();
+		Row firstRow=rows.next();
+		
+		Iterator<Cell> cells=firstRow.cellIterator();
+		int i=0;
+		while(cells.hasNext()) {
+			
+			if(cells.next().getStringCellValue().equalsIgnoreCase(columnName)) {
+				
+				columnNumber=i;
 			}
+		 i++;
 		}
 		
+		while(rows.hasNext()) {
+			Row r=rows.next();
+			if(r.getCell(columnNumber).getStringCellValue().equalsIgnoreCase(data)) {
+				
+				Iterator<Cell> cl=r.cellIterator();
+				while(cl.hasNext()) {
+					
+					Cell c=cl.next();
+					
+					
+					
+					if(c.getCellType()==CellType.STRING) {
+						System.out.println(c.getStringCellValue());
+					}else {
+						System.out.println(NumberToTextConverter.toText(c.getNumericCellValue()));
+
+					}
+					
+				}
+			}
+		}
+		return testdata;
 	}
 
 }
